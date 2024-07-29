@@ -1,31 +1,80 @@
+// Three Error Handling Function in Solidity
+//Require
+//Assert
+//Revert
 
 // SPDX-License-Identifier: MIT
-
-//Write a smart contract that implements the require(), assert() and revert() statements
-
-pragma solidity 0.8.26;
+pragma solidity ^0.8.0;
 
 contract ErrorHandling {
-    uint public balance;
+    address public teacher;
+    mapping(address => string) public grades;
+
+    modifier Teacher() {
+        require(
+            msg.sender == teacher,
+            "Only the teacher can Give the grade to the Student."
+        );
+        _;
+    }
+
     constructor() {
-        balance=0;
+        teacher = msg.sender;
     }
-    function deposit(uint amount) external {
-        require(amount>0, "Deposit amount must be greater than zero");
-        balance += amount;
-    }
-    function withdraw(uint amount) external {
-        require(amount>0, "Withdrawl amount must be greater than zero");
-        if(amount>balance)
-        {
-            revert("Insufficient balance"); //REVERT STATEMENT
+
+    function assignGrade(address student, uint marks) public Teacher {
+        require(marks >= 0 && marks <= 100, "Marks must be between 0 and 100.");
+
+        string memory grade;
+        if (marks >= 95) {
+            grade = "A+";
+        } else if (marks<95 && marks >= 90) {
+            grade = "A";
+        } else if (marks < 90 && marks >= 80) {
+            grade = "B+";
+        } else if (marks < 80 && marks >= 70) {
+            grade = "B";
+        } else if (marks < 70 && marks >= 60) {
+            grade = "C+";
+        } else if (marks < 60 && marks >= 50) {
+            grade = "C";
+        } else if (marks < 50 && marks >= 40) {
+            grade = "D";
+        } else {
+            grade = "F";
         }
-        else {
-            balance -= amount;
-        }
+
+        grades[student] = grade;
     }
-    function checkBalance() external view returns(uint) {
-        assert(balance>=0); //ASSERT STATEMENT 
-        return balance;
+
+    function getGrade(address student) public view returns (string memory) {
+        string memory grade = grades[student];
+
+        require(
+            bytes(grade).length > 0,
+            "Student does not have a grade assigned."
+        );
+
+        return grade;
+    }
+
+    function otherTeacher(address nT) public Teacher {
+        // Ensure the new teacher address is not zero
+        //Here nT represents new teacher
+        require(
+            nT != address(0),
+            "New teacher's address must be valid."
+        );
+
+        teacher = nT;
+    }
+
+    function removeGrade(address stu) public Teacher {
+        string memory grade = grades[stu];
+        if (bytes(grade).length == 0) {
+            revert("Student does not have a grade assigned.");
+        }
+
+        delete grades[stu];
     }
 }
