@@ -1,80 +1,48 @@
-// Three Error Handling Function in Solidity
-//Require
-//Assert
-//Revert
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract ErrorHandling {
-    address public teacher;
-    mapping(address => string) public grades;
+contract SimpleBank {
+    address public owner;
+    mapping(address => uint256) private balances;
 
-    modifier Teacher() {
-        require(
-            msg.sender == teacher,
-            "Only the teacher can Give the grade to the Student."
-        );
+    constructor() {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the owner can perform this action");
         _;
     }
 
-    constructor() {
-        teacher = msg.sender;
+    // Function to deposit Ether into the contract
+    function deposit() public payable 
+    {
+        require(msg.value > 0, "Deposit value must be greater than zero");
+        balances[msg.sender] += msg.value;
     }
 
-    function assignGrade(address student, uint marks) public Teacher {
-        require(marks >= 0 && marks <= 100, "Marks must be between 0 and 100.");
-
-        string memory grade;
-        if (marks >= 95) {
-            grade = "A+";
-        } else if (marks<95 && marks >= 90) {
-            grade = "A";
-        } else if (marks < 90 && marks >= 80) {
-            grade = "B+";
-        } else if (marks < 80 && marks >= 70) {
-            grade = "B";
-        } else if (marks < 70 && marks >= 60) {
-            grade = "C+";
-        } else if (marks < 60 && marks >= 50) {
-            grade = "C";
-        } else if (marks < 50 && marks >= 40) {
-            grade = "D";
-        } else {
-            grade = "F";
-        }
-
-        grades[student] = grade;
+    // Function to withdraw Ether from the contract
+    function withdraw(uint256 amount) public onlyOwner 
+    {
+        require(amount <= address(this).balance, "Insufficient contract balance");
+        payable(owner).transfer(amount);
     }
 
-    function getGrade(address student) public view returns (string memory) {
-        string memory grade = grades[student];
-
-        require(
-            bytes(grade).length > 0,
-            "Student does not have a grade assigned."
-        );
-
-        return grade;
+    // Function to check the balance of the caller
+    function checkBalance() public view returns (uint256)
+    {
+        return balances[msg.sender];
     }
 
-    function otherTeacher(address nT) public Teacher {
-        // Ensure the new teacher address is not zero
-        //Here nT represents new teacher
-        require(
-            nT != address(0),
-            "New teacher's address must be valid."
-        );
-
-        teacher = nT;
+    // Function to transfer funds from the caller's account to another account
+    function transfer(address recipient, uint256 amount) public {
+        require(balances[msg.sender] >= amount, "Insufficient balance");
+        balances[msg.sender] -= amount;
+        balances[recipient] += amount;
     }
 
-    function removeGrade(address stu) public Teacher {
-        string memory grade = grades[stu];
-        if (bytes(grade).length == 0) {
-            revert("Student does not have a grade assigned.");
-        }
-
-        delete grades[stu];
+    // Function to trigger a manual error using revert
+    function triggerError() public pure {
+        revert("This is a manually triggered error");
     }
 }
