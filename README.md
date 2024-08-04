@@ -1,13 +1,40 @@
-# eth-avax_module1
+# MetaCrafters ETH+AVAX Proof Error Handling Assessment
 
-ErrorHandling Contract This is a Solidity smart contract that demonstrates use of assert, revert, and require statements.
+This assessment is part of the MetaCrafters ETH+AVAX Proof course
 
-License This contract is using the MIT License.
+The course provides in-depth knowledge into functions and error handling in Solidity
 
-Prerequisites Solidity ^0.8.26
+In this assessment, we had to show the implementation of Error Handling in Solidity
 
-Contract Details The ErrorHandlingContract is a smart contract that manages a balance variable. The deposit function allows users to add funds to the balance, but it requires the deposit amount to be greater than zero. The withdraw function lets users withdraw funds from the balance, but it checks if the withdrawal amount is greater than the available balance. If it is, the transaction is reverted with an "Insufficient balance" error message. The checkBalance function returns the current value of the balance variable, but it also uses an assert statement to ensure the balance is always greater than or equal to zero. Overall, the contract implements basic error handling and validation using the require(), assert(), and revert() statements to ensure proper behavior and prevent incorrect operations.
+Error handling in programming is a procedure to handle errors that occur during runtime of a program. It helps us handle the interruption and perform some other instructions in response to the error.
 
-Video Walkthrough
+In solidity, error handling is implemented using three main functions: require, revert and assert.
 
-https://www.loom.com/share/101e30129d624e49b5d9d04a6b170bb8?sid=fcfd9d92-0eff-4bff-a75a-b70b6b5e90bc
+## require()
+The require function is used to verify conditions before execution. require() takes two arguments, one condition (necessary) and one message (optional).
+
+If the condition becomes false, require() reverts the state of smart contract to its initial state before execution and returns the passed message
+
+Syntax: require(condition, message)
+
+## revert()
+revert() does not evaluate any condition and does not depend on any state or statement. 
+
+revert() takes one argument only, i.e. a condition
+
+Whenever the EVM encounters the revert function, it reverts the state of the smart contract back to initial state and returns the passed message
+
+This function must be called within a condition block, filtering the condition for raising the error
+
+Syntax: revert(message)
+
+## assert()
+assert() function is used to check for a code that should never be false. 
+
+assert takes one argument,a condition (required)
+
+If the condition resolves to false, assert reverts the state of the smart contract back to initial state and returns the passed message
+
+Syntax: assert(condition)
+
+### Note: require() and revert() return the unused gas back to the caller while assert() uses up all the gas.
